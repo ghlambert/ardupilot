@@ -95,6 +95,10 @@ bool Copter::set_mode(uint8_t mode)
             success = brake_init(ignore_checks);
             break;
 
+        case GUIDED_ALT_HOLD:
+            success = guided_althold_init(ignore_checks);
+            break;
+
         default:
             success = false;
             break;
@@ -205,6 +209,10 @@ void Copter::update_flight_mode()
 
         case BRAKE:
             brake_run();
+            break;
+
+        case GUIDED_ALT_HOLD:
+            guided_althold_run();
             break;
     }
 }
