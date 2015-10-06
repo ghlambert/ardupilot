@@ -1,6 +1,14 @@
 /// -*- tab-width: 4; Mode: C++; c-basic-offset: 4; indent-tabs-mode: nil -*-
 #include "Copter.h"
 
+// Target roll in radians
+static float guided_althold_target_roll;
+
+// Target pitch in radians
+static float guided_althold_target_pitch;
+
+// Target yaw rate in radians/secon
+static float guided_althold_target_yaw_rate;
 
 /*
  * guided_control_althold.pde - init and run calls for guided_althold, flight mode
@@ -15,6 +23,10 @@ bool Copter::guided_althold_init(bool ignore_checks)
 
     // initialise altitude target to stopping point
     pos_control.set_target_to_stopping_point_z();
+
+    guided_althold_target_roll = 0;
+    guided_althold_target_pitch = 0;
+    guided_althold_target_yaw_rate = 0;
 
     return true;
 }
@@ -40,10 +52,11 @@ void Copter::guided_althold_run()
 
     // get pilot desired lean angles
     // To-Do: convert get_pilot_desired_lean_angles to return angles as floats
-    get_pilot_desired_lean_angles(channel_roll->control_in, channel_pitch->control_in, target_roll, target_pitch);
+    target_roll = guided_althold_target_roll;
+    target_pitch = guided_althold_target_pitch;
 
     // get pilot's desired yaw rate
-    target_yaw_rate = get_pilot_desired_yaw_rate(channel_yaw->control_in);
+    target_yaw_rate = guided_althold_target_yaw_rate;
 
     // get pilot desired climb rate
     target_climb_rate = get_pilot_desired_climb_rate(channel_throttle->control_in);
@@ -84,4 +97,16 @@ void Copter::guided_althold_run()
         pos_control.add_takeoff_climb_rate(takeoff_climb_rate, G_Dt);
         pos_control.update_z_controller();
     }
+}
+
+void Copter::guided_althold_set_target(float roll, float pitch, float yaw_rate)
+{
+    // Convert from radians to centi-degrees
+    guided_althold_target_roll = (18000/M_PI_F)*roll;
+    guided_althold_target_pitch = (18000/M_PI_F)*pitch;
+    guided_althold_target_yaw_rate = (18000/M_PI_F)*yaw_rate;
+
+    hal.console->printf_P(
+        PSTR("Guided-AltHold target: Roll=%f, Pitch=%f, YawRate=%f\n"),
+        roll, pitch, yaw_rate);
 }

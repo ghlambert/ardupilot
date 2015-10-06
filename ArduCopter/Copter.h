@@ -682,6 +682,7 @@ private:
     void althold_run();
     bool guided_althold_init(bool ignore_checks);
     void guided_althold_run();
+    void guided_althold_set_target(float roll, float pitch, float yaw_rate);
     bool auto_init(bool ignore_checks);
     void auto_run();
     void auto_takeoff_start(float final_alt_above_home);
