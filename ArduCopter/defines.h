@@ -102,7 +102,8 @@
 #define FLIP        14                  // flip the vehicle on the roll axis
 #define AUTOTUNE    15                  // autotune the vehicle's roll and pitch gains
 #define POSHOLD     16                  // position hold with manual override
-#define NUM_MODES   17
+#define GUIDED_STABILIZE 18             // Guided without GPS and compass
+#define NUM_MODES   19
 
 
 // CH_6 Tuning
@@ -400,5 +401,12 @@ enum Serial2Protocol {
     SERIAL2_FRSKY_DPORT = 2,
     SERIAL2_FRSKY_SPORT = 3 // not supported yet
 };
+
+// for mavlink SET_ATTITUDE_TARGET messages
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_ROLL_RATE_IGNORE     (1<<0)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_PITCH_RATE_IGNORE    (1<<1)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_YAW_RATE_IGNORE      (1<<2)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_THRUST_IGNORE             (1<<6)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_ATTITUDE_IGNORE           (1<<7)
 
 #endif // _DEFINES_H
