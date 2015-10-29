@@ -57,18 +57,15 @@ static void guided_stabilize_run()
     // apply SIMPLE mode transform to pilot inputs
     update_simple_mode();
 
-    if(guided_stabilize_target_mask 
-        & GUIDED_STABILIZE_TARGET_MASK_ATTITUDE_IGNORE)
-    {
-        // convert pilot input to lean angles
-        // To-Do: convert get_pilot_desired_lean_angles to return angles as floats
-        get_pilot_desired_lean_angles(g.rc_1.control_in, g.rc_2.control_in, target_roll, target_pitch);
-    }
-    else
+    get_pilot_desired_lean_angles(g.rc_1.control_in, g.rc_2.control_in, target_roll, target_pitch);
+    
+    if(!(guided_stabilize_target_mask 
+        & GUIDED_STABILIZE_TARGET_MASK_ATTITUDE_IGNORE))
     {
         // Use remote setpoint
         target_roll = guided_stabilize_target_roll;
-        target_pitch = guided_stabilize_target_pitch;
+        // Roll is always ignored for now
+        //target_pitch = guided_stabilize_target_pitch;
     }
 
     if(guided_stabilize_target_mask & GUIDED_STABILIZE_TARGET_MASK_YAW_RATE_IGNORE)
