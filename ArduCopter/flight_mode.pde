@@ -99,6 +99,10 @@ static bool set_mode(uint8_t mode)
             success = guided_stabilize_init(ignore_checks);
             break;
 
+        case GUIDED_ALTHOLD:
+            success = guided_althold_init(ignore_checks);
+            break;
+
         default:
             success = false;
             break;
@@ -208,6 +212,11 @@ static void update_flight_mode()
         case GUIDED_STABILIZE:
             guided_stabilize_run();
             break;
+
+        case GUIDED_ALTHOLD:
+            guided_althold_run();
+            break;
+
     }
 }
 
@@ -338,6 +347,9 @@ print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
         break;
     case GUIDED_STABILIZE:
         port->print_P(PSTR("GUIDED_STABILIZE"));
+        break;
+    case GUIDED_ALTHOLD:
+        port->print_P(PSTR("GUIDED_ALTHOLD"));
         break;
     default:
         port->printf_P(PSTR("Mode(%u)"), (unsigned)mode);

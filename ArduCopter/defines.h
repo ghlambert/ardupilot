@@ -103,7 +103,8 @@
 #define AUTOTUNE    15                  // autotune the vehicle's roll and pitch gains
 #define POSHOLD     16                  // position hold with manual override
 #define GUIDED_STABILIZE 18             // Guided without GPS and compass
-#define NUM_MODES   19
+#define GUIDED_ALTHOLD 19               // Guided without GPS and compass, with altitude control
+#define NUM_MODES   20
 
 
 // CH_6 Tuning
