@@ -95,6 +95,10 @@ bool Copter::set_mode(uint8_t mode)
             success = brake_init(ignore_checks);
             break;
 
+        case GUIDED_STABILIZE:
+            success = guided_stabilize_init(ignore_checks);
+            break;
+
         default:
             success = false;
             break;
@@ -206,6 +210,11 @@ void Copter::update_flight_mode()
         case BRAKE:
             brake_run();
             break;
+
+        case GUIDED_STABILIZE:
+            guided_stabilize_run();
+            break;
+
     }
 }
 
@@ -371,6 +380,9 @@ void Copter::print_flight_mode(AP_HAL::BetterStream *port, uint8_t mode)
         break;
     case BRAKE:
         port->print_P(PSTR("BRAKE"));
+        break;
+    case GUIDED_STABILIZE:
+        port->print_P(PSTR("GUIDED_STABILIZE"));
         break;
     default:
         port->printf_P(PSTR("Mode(%u)"), (unsigned)mode);

@@ -101,7 +101,8 @@ enum autopilot_modes {
     FLIP =         14,  // automatically flip the vehicle on the roll axis
     AUTOTUNE =     15,  // automatically tune the vehicle's roll and pitch gains
     POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
-    BRAKE =        17   // full-brake using inertial/GPS system, no pilot input
+    BRAKE =        17,  // full-brake using inertial/GPS system, no pilot input
+    GUIDED_STABILIZE = 18   // guided stabilize
 };
 
 // Tuning enumeration
@@ -418,5 +419,12 @@ enum FlipState {
 
 // for PILOT_THR_BHV parameter
 #define THR_BEHAVE_FEEDBACK_FROM_MID_STICK (1<<0)
+
+// for mavlink SET_ATTITUDE_TARGET messages
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_ROLL_RATE_IGNORE     (1<<0)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_PITCH_RATE_IGNORE    (1<<1)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_YAW_RATE_IGNORE      (1<<2)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_THRUST_IGNORE             (1<<6)
+#define MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_ATTITUDE_IGNORE           (1<<7)
 
 #endif // _DEFINES_H

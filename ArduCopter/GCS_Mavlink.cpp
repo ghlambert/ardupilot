@@ -1473,6 +1473,55 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
         break;
     }
 
+    case MAVLINK_MSG_ID_SET_ATTITUDE_TARGET:    // MAV ID: 82
+    {
+        // decode packet
+        mavlink_set_attitude_target_t packet;
+        mavlink_msg_set_attitude_target_decode(msg, &packet);
+
+        // exit if vehicle is not in Guided-Stabilize mode
+        if (copter.control_mode != GUIDED_STABILIZE)
+        {
+            result = MAV_RESULT_FAILED;
+            break;
+        }
+
+        bool roll_rate_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_ROLL_RATE_IGNORE;
+        bool pitch_rate_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_PITCH_RATE_IGNORE;
+        bool yaw_rate_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_YAW_RATE_IGNORE;
+        bool thrust_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_THRUST_IGNORE;
+        bool attitude_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_ATTITUDE_IGNORE;
+
+        // The Guided-Stabilize mode only supports one specific type mask, which
+        // allow to set the target roll (radians), pitch (radians) and yaw rate
+        // (radians/second). This is accomplished when the type mask corresponds
+        // to:
+        //
+        //  roll_rate_ignore && pitch_rate_ignore && !yaw_rate_ignore &&
+        //      thrust_ignore && !attitude_ignore
+        //
+        // In that case, the target roll and pitch are computed from the
+        // quaternion, and the yaw rate is taken directly from the yaw rate
+        // provided in the message.
+
+        if(roll_rate_ignore && pitch_rate_ignore && !yaw_rate_ignore &&
+            thrust_ignore && !attitude_ignore)
+        {
+            // Compute target roll/pitch from Quaternion
+            float target_roll, target_pitch, target_yaw;
+            Quaternion rp_target(packet.q[0], packet.q[1], packet.q[2], packet.q[3]);
+            rp_target.to_euler(target_roll, target_pitch, target_yaw);
+            copter.guided_stabilize_set_target(target_roll, target_pitch, packet.body_yaw_rate);
+            result = MAV_RESULT_ACCEPTED;
+        }
+        else
+        {
+            result = MAV_RESULT_UNSUPPORTED;
+        }
+
+        break;
+    }
+
     case MAVLINK_MSG_ID_SET_POSITION_TARGET_LOCAL_NED:     // MAV ID: 84
     {
         // decode packet

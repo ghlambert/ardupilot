@@ -776,6 +776,9 @@ private:
     void sport_run();
     bool stabilize_init(bool ignore_checks);
     void stabilize_run();
+    bool guided_stabilize_init(bool ignore_checks);
+    void guided_stabilize_run();
+    void guided_stabilize_set_target(float roll, float pitch, float yaw_rate);
     void crash_check();
     void parachute_check();
     void parachute_release();
