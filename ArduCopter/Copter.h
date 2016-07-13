@@ -778,7 +778,10 @@ private:
     void stabilize_run();
     bool guided_stabilize_init(bool ignore_checks);
     void guided_stabilize_run();
-    void guided_stabilize_set_target(float roll, float pitch, float yaw_rate);
+    void guided_stabilize_set_target_attitude(float roll, float pitch);
+    void guided_stabilize_unset_target_attitude();
+    void guided_stabilize_set_target_yaw_rate(float yaw_rate);
+    void guided_stabilize_unset_target_yaw_rate();
     void crash_check();
     void parachute_check();
     void parachute_release();

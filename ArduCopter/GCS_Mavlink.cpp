@@ -1492,32 +1492,32 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
         bool thrust_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_THRUST_IGNORE;
         bool attitude_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_ATTITUDE_IGNORE;
 
-        // The Guided-Stabilize mode only supports one specific type mask, which
-        // allow to set the target roll (radians), pitch (radians) and yaw rate
-        // (radians/second). This is accomplished when the type mask corresponds
-        // to:
-        //
-        //  roll_rate_ignore && pitch_rate_ignore && !yaw_rate_ignore &&
-        //      thrust_ignore && !attitude_ignore
-        //
-        // In that case, the target roll and pitch are computed from the
-        // quaternion, and the yaw rate is taken directly from the yaw rate
-        // provided in the message.
+        // The Guided-Stabilize mode only supports attitude and yaw rate
+        // commands.
 
-        if(roll_rate_ignore && pitch_rate_ignore && !yaw_rate_ignore &&
-            thrust_ignore && !attitude_ignore)
+        if(attitude_ignore)
+        {
+            copter.guided_stabilize_unset_target_attitude();
+        }
+        else
         {
             // Compute target roll/pitch from Quaternion
             float target_roll, target_pitch, target_yaw;
             Quaternion rp_target(packet.q[0], packet.q[1], packet.q[2], packet.q[3]);
             rp_target.to_euler(target_roll, target_pitch, target_yaw);
-            copter.guided_stabilize_set_target(target_roll, target_pitch, packet.body_yaw_rate);
-            result = MAV_RESULT_ACCEPTED;
+            copter.guided_stabilize_set_target_attitude(target_roll, target_pitch);
+        }
+
+        if(yaw_rate_ignore)
+        {
+            copter.guided_stabilize_unset_target_yaw_rate();
         }
         else
         {
-            result = MAV_RESULT_UNSUPPORTED;
+            copter.guided_stabilize_set_target_yaw_rate(packet.body_yaw_rate);
         }
+
+        result = MAV_RESULT_ACCEPTED;
 
         break;
     }
