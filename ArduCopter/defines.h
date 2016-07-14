@@ -102,7 +102,8 @@ enum autopilot_modes {
     AUTOTUNE =     15,  // automatically tune the vehicle's roll and pitch gains
     POSHOLD =      16,  // automatic position hold with manual override, with automatic throttle
     BRAKE =        17,  // full-brake using inertial/GPS system, no pilot input
-    GUIDED_STABILIZE = 18   // guided stabilize
+    GUIDED_STABILIZE = 18,   // guided stabilize
+    GUIDED_ALTHOLD = 19 // guided alt-hold
 };
 
 // Tuning enumeration

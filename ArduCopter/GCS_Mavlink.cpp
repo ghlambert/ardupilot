@@ -1479,25 +1479,35 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
         mavlink_set_attitude_target_t packet;
         mavlink_msg_set_attitude_target_decode(msg, &packet);
 
-        // exit if vehicle is not in Guided-Stabilize mode
-        if (copter.control_mode != GUIDED_STABILIZE)
+        // exit if vehicle is not in GUIDED_STABILIZE or GUIDED_ALTHOLD mode
+        if ((copter.control_mode != GUIDED_STABILIZE) && (copter.control_mode != GUIDED_ALTHOLD))
         {
             result = MAV_RESULT_FAILED;
             break;
         }
 
+        /* For future usage.
         bool roll_rate_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_ROLL_RATE_IGNORE;
         bool pitch_rate_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_PITCH_RATE_IGNORE;
-        bool yaw_rate_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_YAW_RATE_IGNORE;
         bool thrust_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_THRUST_IGNORE;
+        */
+
+        bool yaw_rate_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_BODY_YAW_RATE_IGNORE;
         bool attitude_ignore = packet.type_mask & MAVLINK_SET_ATTITUDE_TARGET_TYPE_MASK_ATTITUDE_IGNORE;
 
-        // The Guided-Stabilize mode only supports attitude and yaw rate
+        // The GUIDED_STABILIZE and GUIDED_ALTHOLD modes only support attitude and yaw rate
         // commands.
 
         if(attitude_ignore)
         {
-            copter.guided_stabilize_unset_target_attitude();
+            if(copter.control_mode == GUIDED_STABILIZE)
+            {
+                copter.guided_stabilize_unset_target_attitude();
+            }
+            else if(copter.control_mode == GUIDED_ALTHOLD)
+            {
+                copter.guided_althold_unset_target_attitude();
+            }
         }
         else
         {
@@ -1505,16 +1515,38 @@ void GCS_MAVLINK::handleMessage(mavlink_message_t* msg)
             float target_roll, target_pitch, target_yaw;
             Quaternion rp_target(packet.q[0], packet.q[1], packet.q[2], packet.q[3]);
             rp_target.to_euler(target_roll, target_pitch, target_yaw);
-            copter.guided_stabilize_set_target_attitude(target_roll, target_pitch);
+
+            if(copter.control_mode == GUIDED_STABILIZE)
+            {
+                copter.guided_stabilize_set_target_attitude(target_roll, target_pitch);
+            }
+            else if(copter.control_mode == GUIDED_ALTHOLD)
+            {
+                copter.guided_althold_set_target_attitude(target_roll, target_pitch);
+            }
         }
 
         if(yaw_rate_ignore)
         {
-            copter.guided_stabilize_unset_target_yaw_rate();
+            if(copter.control_mode == GUIDED_STABILIZE)
+            {
+                copter.guided_stabilize_unset_target_yaw_rate();
+            }
+            else if(copter.control_mode == GUIDED_ALTHOLD)
+            {
+                copter.guided_althold_unset_target_yaw_rate();
+            }
         }
         else
         {
-            copter.guided_stabilize_set_target_yaw_rate(packet.body_yaw_rate);
+            if(copter.control_mode == GUIDED_STABILIZE)
+            {
+                copter.guided_stabilize_set_target_yaw_rate(packet.body_yaw_rate);
+            }
+            else if(copter.control_mode == GUIDED_ALTHOLD)
+            {
+                copter.guided_althold_set_target_yaw_rate(packet.body_yaw_rate);
+            }
         }
 
         result = MAV_RESULT_ACCEPTED;
