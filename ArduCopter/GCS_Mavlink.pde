@@ -792,11 +792,14 @@ GCS_MAVLINK::data_stream_send(void)
 
     if (stream_trigger(STREAM_EXTENDED_STATUS)) {
         send_message(MSG_EXTENDED_STATUS1);
+
+        /* Only send MSG_EXTENDED_STATUS1 to unload communication
         send_message(MSG_EXTENDED_STATUS2);
         send_message(MSG_CURRENT_WAYPOINT);
         send_message(MSG_GPS_RAW);
         send_message(MSG_NAV_CONTROLLER_OUTPUT);
         send_message(MSG_LIMITS_STATUS);
+        */
     }
 
     if (gcs_out_of_time) return;
