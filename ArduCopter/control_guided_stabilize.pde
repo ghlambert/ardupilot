@@ -64,8 +64,7 @@ static void guided_stabilize_run()
     {
         // Use remote setpoint
         target_roll = guided_stabilize_target_roll;
-        // Roll is always ignored for now
-        //target_pitch = guided_stabilize_target_pitch;
+        target_pitch = guided_stabilize_target_pitch;
     }
 
     if(guided_stabilize_target_mask & GUIDED_STABILIZE_TARGET_MASK_YAW_RATE_IGNORE)

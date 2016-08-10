@@ -69,8 +69,7 @@ static void guided_althold_run()
     {
         // Use remote setpoint instead of pilot input
         target_roll = guided_althold_target_roll;
-        // Roll is always ignored for now
-        //target_pitch = guided_althold_target_pitch;
+        target_pitch = guided_althold_target_pitch;
     }
 
     if(guided_althold_target_mask & GUIDED_ALTHOLD_TARGET_MASK_YAW_RATE_IGNORE)
