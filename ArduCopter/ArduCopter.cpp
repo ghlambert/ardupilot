@@ -165,6 +165,9 @@ void Copter::setup()
 
     init_ardupilot();
 
+    // Setup serial port for Mavlink data forwarding uartE --> Mavlink
+    if (hal.uartE != NULL) {hal.uartE->begin(57600, 256, 256);}
+
     // initialise the main loop scheduler
     scheduler.init(&scheduler_tasks[0], ARRAY_SIZE(scheduler_tasks));
 
@@ -348,6 +351,30 @@ void Copter::update_batt_compass(void)
 // should be run at 10hz
 void Copter::ten_hz_logging_loop()
 {
+    //-------------------------------------------------------------------------
+    // Mavlink data forwarding uartE --> Mavlink
+    //-------------------------------------------------------------------------
+
+    char l_strC = 0;
+    static char buf[36];
+    static unsigned int i;
+
+    if (hal.uartA != NULL) {
+        //--- read message on portE
+        while( (hal.uartE->available() > 0) && (l_strC != '\n') && (i < sizeof(buf)) ) {
+            l_strC = hal.uartE->read();
+            buf[i++] = l_strC;
+        }
+        //--- Test if message received is complete
+        if( ((i > 0) && (buf[i-1] == '\n')) || (i >= sizeof(buf)) ) {
+            i = 0;
+            buf[32]='\0';
+            copter.gcs_send_text_P(SEVERITY_LOW,buf);
+        }
+    }
+
+    //-------------------------------------------------------------------------
+
     // log attitude data if we're not already logging at the higher rate
     if (should_log(MASK_LOG_ATTITUDE_MED) && !should_log(MASK_LOG_ATTITUDE_FAST)) {
         Log_Write_Attitude();
